@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Link, useSearchParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
+import {useErrorService} from "../../services/useErrorService";
 import {useShelfService} from "../../services/useShelfService";
 import {BookEntry} from "./BookEntry";
 import {UploadForm} from "./UploadForm";
@@ -9,6 +10,7 @@ export const ShelfPage = () => {
 
   const {t} = useTranslation();
   const [searchParams] = useSearchParams();
+  const {handleServerError} = useErrorService();
   const {getBooks} = useShelfService();
 
   const [uploadFormOpen, setUploadFormOpen] = useState(searchParams.get("upload") === "true");
@@ -23,6 +25,9 @@ export const ShelfPage = () => {
         } else {
           setItems(prevItems => [...prevItems, ...data]);
         }
+      })
+      .catch(error => {
+        handleServerError(error);
       });
   };
 
