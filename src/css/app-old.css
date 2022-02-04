@@ -108,7 +108,7 @@ table.zebra tr:nth-child(even) {
 /* LOADING INDICATOR */
 
 .loader {
-    margin: 0 auto;
+    margin: 10px auto;
     display: block;
     text-align: center;
     width: 100%;

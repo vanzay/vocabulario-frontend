@@ -6,6 +6,7 @@ import {useBookService} from "../../services/useBookService";
 import {useDictionaryService} from "../../services/useDictionaryService";
 import {useErrorService} from "../../services/useErrorService";
 import {getCurrentPage, getLangIso2} from "../../../utils";
+import {PulseLoader} from "../../PulseLoader";
 import {PhraseList} from "./PhraseList";
 
 export const PhraseTab = (props) => {
@@ -22,10 +23,12 @@ export const PhraseTab = (props) => {
   const langIso2 = getLangIso2();
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [items, setItems] = useState([]);
 
   const loadData = () => {
+    setLoading(true);
     getPhrases({bookId, inDictionary: props.inDictionary, langIso2, page})
       .then(data => {
         if (page === 0) {
@@ -33,9 +36,11 @@ export const PhraseTab = (props) => {
         } else {
           setItems(prevItems => [...prevItems, ...data]);
         }
+        setLoading(false);
       })
       .catch(error => {
         handleServerError(error);
+        setLoading(false);
       });
   };
 
@@ -117,9 +122,13 @@ export const PhraseTab = (props) => {
       <PhraseList inDictionary={props.inDictionary} items={items}/>
       }
 
+      <PulseLoader loading={loading}/>
+
+      {!loading &&
       <span className="link_more" onClick={loadMore}>
         <span className="txt_underline">{t("action.show.more")}</span>
       </span>
+      }
     </div>
   );
 }

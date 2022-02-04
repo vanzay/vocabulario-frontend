@@ -32,11 +32,7 @@ export const BookPage = () => {
         setSummary(data.summary);
       })
       .catch(error => {
-        if (error.response && error.response.status === 401) {
-          navigate("/user/login", {replace: true, state: {from: getCurrentPage()}});
-        } else {
-          handleServerError(error);
-        }
+        handleServerError(error);
       });
   }
 

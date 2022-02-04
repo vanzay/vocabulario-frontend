@@ -3,6 +3,7 @@ import {useSearchParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {useDictionaryService} from "../../services/useDictionaryService";
 import {useErrorService} from "../../services/useErrorService";
+import {PulseLoader} from "../../PulseLoader";
 import {PhraseList} from "./PhraseList";
 import {PhraseForm} from "./PhraseForm";
 
@@ -16,6 +17,7 @@ export const PhrasePanel = (props) => {
   const langIso2 = searchParams.get("lang");
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState({
     langIso2,
     term: "",
@@ -27,6 +29,7 @@ export const PhrasePanel = (props) => {
 
   useEffect(() => {
     // TODO delay + abort previous
+    setLoading(true);
     getPhrases(filter)
       .then(data => {
         if (filter.page === 0) {
@@ -34,6 +37,7 @@ export const PhrasePanel = (props) => {
         } else {
           setItems(prevItems => [...prevItems, ...data]);
         }
+        setLoading(false);
       });
   }, [filter]);
 
@@ -154,9 +158,13 @@ export const PhrasePanel = (props) => {
 
         <PhraseList items={items} onEdit={openEditForm}/>
 
+        <PulseLoader loading={loading}/>
+
+        {!loading &&
         <span className="link_more" onClick={loadMore}>
           <span className="txt_underline">{t("action.show.more")}</span>
         </span>
+        }
       </div>
 
       <PhraseForm userPhrase={phraseToEdit} onClose={closeEditForm} onEditSuccess={onEditSuccess}/>
