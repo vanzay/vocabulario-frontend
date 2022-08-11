@@ -538,7 +538,7 @@ p {
 }
 
 .fade {
-    position: absolute;
+    position: fixed;
     z-index: 3000;
     overflow: hidden;
     width: 100%;
