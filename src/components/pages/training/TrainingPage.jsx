@@ -131,7 +131,7 @@ export const TrainingPage = () => {
       playPronunciation();
     }
 
-    sendAnswer({phraseId: items[0].phrase.id, answer: encodeURIComponent(answer), mode, hintsCount})
+    sendAnswer({phraseId: items[0].phrase.id, answer, mode, hintsCount})
       .then(data => {
         // TODO data.points
       })
