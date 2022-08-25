@@ -24,14 +24,14 @@ export const PhraseTab = (props) => {
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [items, setItems] = useState([]);
 
   const loadData = () => {
     setLoading(true);
-    getPhrases({bookId, inDictionary: props.inDictionary, langIso2, page})
+    getPhrases({bookId, inDictionary: props.inDictionary, langIso2, offset})
       .then(data => {
-        if (page === 0) {
+        if (offset === 0) {
           setItems(data);
         } else {
           setItems(prevItems => [...prevItems, ...data]);
@@ -44,10 +44,10 @@ export const PhraseTab = (props) => {
       });
   };
 
-  useEffect(loadData, [bookId, langIso2, page]);
+  useEffect(loadData, [bookId, langIso2, offset]);
 
   const loadMore = () => {
-    setPage(page + 1);
+    setOffset(items.length);
   }
 
   const toggleSelectAll = (e) => {
@@ -84,7 +84,6 @@ export const PhraseTab = (props) => {
 
     try {
       await addPhrases({bookId: params.id, onStudying, idList});
-      // TODO offset issue for loadMore
       setItems(items.filter(item => !idList.includes(item.base.phraseId)));
       props.onChange();
       setSubmitted(false);
