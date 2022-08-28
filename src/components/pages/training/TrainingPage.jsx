@@ -175,7 +175,7 @@ export const TrainingPage = () => {
       <div className="w-container study_container">
         <div className="training-block">
           {mode === "memory" &&
-          <div className="translation-quest">{items[0].translation || "???"}</div>
+          <div className="translation-quest">{items[0].translation || "-"}</div>
           }
           {mode === "audition" &&
           <div className="translation-quest">

@@ -51,10 +51,10 @@ export const PhraseEntry = (props) => {
         }
       </td>
       <td className="translation">
-        {props.base.translation &&
-        <span>{props.base.translation}</span>
+        {(props.base.userTranslation || props.base.translation) &&
+        <span>{props.base.userTranslation || props.base.translation}</span>
         }
-        {!props.base.translation &&
+        {!(props.base.userTranslation || props.base.translation) &&
         <span className={user ? "" : "no-translation"}>-</span>
         }
       </td>

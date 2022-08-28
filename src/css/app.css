@@ -884,7 +884,7 @@ label.btn_upload input[type="file"] {
     float: left;
     width: 100%;
     min-width: 100%;
-    text-align: center;
+    /*text-align: center;*/
 }
 
 .frequency {
