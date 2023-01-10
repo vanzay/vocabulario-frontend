@@ -1,11 +1,14 @@
 import React, {useContext, useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
-import {useAlert} from "react-alert";
 import {checkEmail, getLangIso2} from "../../../utils";
 import {useUserService} from "../../services/useUserService";
-import {useErrorService} from "../../services/useErrorService";
 import {AuthContext} from "../../AuthState";
+import {Label} from "../../form/Label";
+import {EmailInput} from "../../form/EmailInput";
+import {PasswordInput} from "../../form/PasswordInput";
+import {Form} from "../../form/Form";
+import {SubmitButton} from "../../form/SubmitButton";
 
 export const RegisterPage = () => {
 
@@ -13,8 +16,6 @@ export const RegisterPage = () => {
   const location = useLocation();
   const {t} = useTranslation();
   const auth = useContext(AuthContext);
-  const alert = useAlert();
-  const {handleServerError} = useErrorService();
   const {register} = useUserService();
 
   const {from} = location.state || {from: "/shelf"};
@@ -22,7 +23,6 @@ export const RegisterPage = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     if (auth.user) {
@@ -30,49 +30,48 @@ export const RegisterPage = () => {
     }
   }, []);
 
-  const submit = async () => {
-    if (submitted) {
-      return;
-    }
-
+  const checkForm = () => {
     if (!checkEmail(email)) {
-      alert.error(t("invalid.email"));
-      return;
+      return t("invalid.email");
     }
-
     if (password.length < 5) {
-      alert.error(t("invalid.password"));
-      return;
+      return t("invalid.password");
     }
+    return null;
+  }
 
-    setSubmitted(true);
-
-    try {
-      const user = await register({email, password, langIso2});
-      auth.login(user);
-      navigate(from, {replace: true});
-    } catch (e) {
-      handleServerError(e);
-      setSubmitted(false);
-    }
+  const submit = async () => {
+    const user = await register({email, password, langIso2});
+    auth.login(user);
+    navigate(from, {replace: true});
   }
 
   return auth.user
     ? (<></>)
     : (
       <div className="w-form form_upload">
-        <label htmlFor="email" className="field_label">{t("label.username")}</label>
-        <input id="email" autoFocus type="text" className="w-input input"
-               onChange={(e) => setEmail(e.target.value)}/>
+        <Form checkHandler={checkForm}
+              submitHandler={submit}>
 
-        <label htmlFor="password" className="field_label">{t("label.password")}</label>
-        <input id="password" type="password" className="w-input input"
-               onChange={(e) => setPassword(e.target.value)}/>
+          <Label for="email" title={t("label.username")}/>
+          <EmailInput
+            id="email"
+            autoFocus={true}
+            maxLength="64"
+            required="required"
+            onChange={(e) => setEmail(e.target.value)}/>
 
-        <div className="form_bottom">
-          <button type="button" className={"w-button " + (submitted ? "btn-disabled" : "btn")}
-                  onClick={submit}>{t("action.register")}</button>
-        </div>
+          <Label for="password" title={t("label.password")}/>
+          <PasswordInput
+            id="password"
+            maxLength="64"
+            required="required"
+            onChange={(e) => setPassword(e.target.value)}/>
+
+          <div className="form_bottom">
+            <SubmitButton value={t("action.register")}/>
+          </div>
+        </Form>
       </div>
     );
 }

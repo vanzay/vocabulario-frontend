@@ -1,56 +1,53 @@
 import React, {useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {useAlert} from "react-alert";
 import {useTranslation} from "react-i18next";
 import {useUserService} from "../../services/useUserService";
-import {useErrorService} from "../../services/useErrorService";
+import {Label} from "../../form/Label";
+import {PasswordInput} from "../../form/PasswordInput";
+import {Form} from "../../form/Form";
+import {SubmitButton} from "../../form/SubmitButton";
 
 export const ChangePasswordPage = () => {
 
   const navigate = useNavigate();
   const {t} = useTranslation();
   const [searchParams] = useSearchParams();
-  const alert = useAlert();
-  const {handleServerError} = useErrorService();
   const {changePassword} = useUserService();
 
   const uid = searchParams.get("uid");
   const token = searchParams.get("token");
 
-  const [submitted, setSubmitted] = useState(false);
   const [password, setPassword] = useState("");
 
-  const submit = async () => {
-    if (submitted) {
-      return;
-    }
-
+  const checkForm = () => {
     if (password.length < 5) {
-      alert.error(t("invalid.password"));
-      return;
+      return t("invalid.password");
     }
+    return null;
+  }
 
-    setSubmitted(true);
-
-    try {
-      await changePassword({uid, token, password});
-      navigate("/user/login", {replace: true});
-    } catch (e) {
-      handleServerError(e);
-      setSubmitted(false);
-    }
+  const submit = async () => {
+    await changePassword({uid, token, password});
+    navigate("/user/login", {replace: true});
   }
 
   return (
     <div className="w-form form_upload">
-      <label htmlFor="password" className="field_label">{t("label.password")}</label>
-      <input id="password" type="password" autoFocus className="w-input input"
-             onChange={(e) => setPassword(e.target.value)}/>
+      <Form checkHandler={checkForm}
+            submitHandler={submit}>
 
-      <div className="form_bottom">
-        <button type="button" className={"w-button " + (submitted ? "btn-disabled" : "btn")}
-                onClick={submit}>{t("action.change.password")}</button>
-      </div>
+        <Label for="password" title={t("label.password")}/>
+        <PasswordInput
+          id="password"
+          autoFocus={true}
+          maxLength="64"
+          required="required"
+          onChange={(e) => setPassword(e.target.value)}/>
+
+        <div className="form_bottom">
+          <SubmitButton value={t("action.change.password")}/>
+        </div>
+      </Form>
     </div>
   );
 }
