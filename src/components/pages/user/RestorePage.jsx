@@ -1,40 +1,30 @@
 import React, {useState} from "react";
 import {Trans, useTranslation} from "react-i18next";
-import {useAlert} from "react-alert";
 import {useUserService} from "../../services/useUserService";
-import {useErrorService} from "../../services/useErrorService";
 import {checkEmail} from "../../../utils";
+import {Label} from "../../form/Label";
+import {EmailInput} from "../../form/EmailInput";
+import {Form} from "../../form/Form";
+import {SubmitButton} from "../../form/SubmitButton";
 
 export const RestorePage = () => {
 
   const {t} = useTranslation();
-  const alert = useAlert();
-  const {handleServerError} = useErrorService();
   const {sendRestoreEmail} = useUserService();
 
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const submit = async () => {
-    if (submitted) {
-      return;
-    }
-
+  const checkForm = () => {
     if (!checkEmail(email)) {
-      alert.error(t("invalid.email"));
-      return;
+      return t("invalid.email");
     }
+    return null;
+  }
 
-    setSubmitted(true);
-
-    try {
-      await sendRestoreEmail({email});
-      setSent(true);
-    } catch (e) {
-      handleServerError(e);
-      setSubmitted(false);
-    }
+  const submit = async () => {
+    await sendRestoreEmail({email});
+    setSent(true);
   }
 
   return sent
@@ -50,14 +40,21 @@ export const RestorePage = () => {
     )
     : (
       <div className="w-form form_upload">
-        <label htmlFor="email" className="field_label">{t("label.username")}</label>
-        <input id="email" autoFocus type="text" className="w-input input"
-               onChange={(e) => setEmail(e.target.value)}/>
+        <Form checkHandler={checkForm}
+              submitHandler={submit}>
 
-        <div className="form_bottom">
-          <button type="button" className={"w-button " + (submitted ? "btn-disabled" : "btn")}
-                  onClick={submit}>{t("action.restore")}</button>
-        </div>
+          <Label for="email" title={t("label.username")}/>
+          <EmailInput
+            id="email"
+            autoFocus={true}
+            maxLength="64"
+            required="required"
+            onChange={(e) => setEmail(e.target.value)}/>
+
+          <div className="form_bottom">
+            <SubmitButton value={t("action.restore")}/>
+          </div>
+        </Form>
       </div>
     );
 }
